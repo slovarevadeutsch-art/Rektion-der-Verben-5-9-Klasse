@@ -1,2 +1,336 @@
 # Rektion-der-Verben-5-9-Klasse
 Rektion der Verben
+Вот готовый код простой веб-страницы с тестом. Он содержит 15 случайных вопросов из предоставленного списка. Вы можете сохранить этот код в файл с расширением `.html` (например, `test.html`) и открыть его в любом браузере.
+
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Управление глаголов в немецком</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .progress {
+            text-align: right;
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        .question {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2980b9;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #bdc3c7;
+            background-color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        button:hover:not(:disabled) {
+            border-color: #3498db;
+            background-color: #ecf0f1;
+        }
+
+        button.correct {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        button.wrong {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+
+        button:disabled {
+            cursor: default;
+        }
+
+        #next-btn {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            font-weight: bold;
+            display: none;
+            text-align: center;
+        }
+
+        #next-btn:hover {
+            background-color: #2980b9;
+        }
+
+        #result {
+            text-align: center;
+            display: none;
+        }
+
+        #result h2 {
+            color: #2c3e50;
+        }
+
+        #result p {
+            font-size: 20px;
+        }
+
+        #restart-btn {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #restart-btn:hover {
+            background-color: #8e44ad;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-section">
+        <h1>Управление глаголов</h1>
+        <div class="progress" id="progress">Вопрос 1 из 15</div>
+        <div class="question" id="question-text">Загрузка...</div>
+        <div class="options" id="options-container"></div>
+        <button id="next-btn">Следующий вопрос</button>
+    </div>
+
+    <div id="result">
+        <h2>Тест завершен!</h2>
+        <p>Ваш результат: <span id="score"></span> из 15</p>
+        <button id="restart-btn">Пройти еще раз</button>
+    </div>
+</div>
+
+<script>
+    // База данных вопросов
+    const allQuestions = [
+        { verb: "abhängen", correct: "von D.", options: ["von D.", "auf A.", "an A.", "mit D."] },
+        { verb: "achten", correct: "auf A.", options: ["auf A.", "an D.", "über A.", "für A."] },
+        { verb: "anfangen", correct: "mit D.", options: ["mit D.", "von D.", "an A.", "auf A."] },
+        { verb: "antworten", correct: "auf A.", options: ["auf A.", "an A.", "über A.", "für A."] },
+        { verb: "arbeiten", correct: "an D.", options: ["an D.", "auf A.", "mit D.", "über A."] },
+        { verb: "sich ärgern", correct: "über A.", options: ["über A.", "auf A.", "an D.", "von D."] },
+        { verb: "aufhören", correct: "mit D.", options: ["mit D.", "auf A.", "an D.", "von D."] },
+        { verb: "sich auswirken", correct: "auf A.", options: ["auf A.", "an D.", "für A.", "über A."] },
+        { verb: "sich bedanken", correct: "bei D. für A.", options: ["bei D. für A.", "an D. über A.", "auf A. für A.", "von D. für A."] },
+        { verb: "beginnen", correct: "mit D.", options: ["mit D.", "an D.", "auf A.", "von D."] },
+        { verb: "sich bekannt machen", correct: "mit D.", options: ["mit D.", "an D.", "über A.", "für A."] },
+        { verb: "sich beklagen", correct: "bei D. über A.", options: ["bei D. über A.", "an D. für A.", "auf A. über A.", "von D. an A."] },
+        { verb: "sich beschäftigen", correct: "mit D.", options: ["mit D.", "an D.", "über A.", "auf A."] },
+        { verb: "sich bewerben", correct: "um A.", options: ["um A.", "für A.", "auf A.", "an A."] },
+        { verb: "bitten", correct: "A. um A.", options: ["A. um A.", "D. für A.", "A. für A.", "D. um A."] },
+        { verb: "danken", correct: "D. für A.", options: ["D. für A.", "A. um A.", "D. über A.", "A. für A."] },
+        { verb: "denken", correct: "an A.", options: ["an A.", "über A.", "auf A.", "von D."] },
+        { verb: "sich entscheiden", correct: "für A.", options: ["für A.", "auf A.", "an A.", "über A."] },
+        { verb: "sich entschuldigen", correct: "bei D. für A.", options: ["bei D. für A.", "an D. über A.", "auf A. für A.", "von D. an A."] },
+        { verb: "sich erinnern", correct: "an A.", options: ["an A.", "über A.", "auf A.", "von D."] },
+        { verb: "sich erkundigen", correct: "bei D. nach D.", options: ["bei D. nach D.", "an D. über A.", "auf A. für A.", "von D. an D."] },
+        { verb: "erzählen", correct: "über A. / von D.", options: ["über A. / von D.", "an A. / auf A.", "für A. / mit D.", "auf A. / an D."] },
+        { verb: "fragen", correct: "A. nach D.", options: ["A. nach D.", "D. über A.", "A. für A.", "D. an D."] },
+        { verb: "sich freuen", correct: "auf A. / über A.", options: ["auf A. / über A.", "an A. / für A.", "mit D. / von D.", "auf D. / an A."] },
+        { verb: "sich fürchten", correct: "vor D.", options: ["vor D.", "vor A.", "für A.", "an D."] },
+        { verb: "gehören", correct: "zu D.", options: ["zu D.", "in A.", "an D.", "auf A."] },
+        { verb: "geraten", correct: "in A.", options: ["in A.", "in D.", "an A.", "auf A."] },
+        { verb: "sich gewöhnen", correct: "an A.", options: ["an A.", "an D.", "auf A.", "für A."] },
+        { verb: "glauben", correct: "an A.", options: ["an A.", "an D.", "auf A.", "über A."] },
+        { verb: "gratulieren", correct: "D. zu D.", options: ["D. zu D.", "A. für A.", "D. für A.", "A. zu D."] },
+        { verb: "halten", correct: "von D.", options: ["von D.", "von A.", "an D.", "auf A."] },
+        { verb: "halten", correct: "A. für A.", options: ["A. für A.", "D. für A.", "A. um A.", "D. an A."] },
+        { verb: "sich handeln", correct: "um A.", options: ["um A.", "für A.", "auf A.", "an A."] },
+        { verb: "hoffen", correct: "auf A.", options: ["auf A.", "auf D.", "an A.", "für A."] },
+        { verb: "sich informieren", correct: "über A.", options: ["über A.", "über D.", "an A.", "für A."] },
+        { verb: "sich interessieren", correct: "für A.", options: ["für A.", "für D.", "an A.", "auf A."] },
+        { verb: "kämpfen", correct: "mit D. gegen A. für A. / um A.", options: ["mit D. gegen A. für A. / um A.", "an D. auf A. für A. / um A.", "mit A. gegen D. für D. / um D.", "von D. gegen A. an A. / auf A."] },
+        { verb: "sich konzentrieren", correct: "auf A.", options: ["auf A.", "auf D.", "an A.", "für A."] },
+        { verb: "sich kümmern", correct: "um A.", options: ["um A.", "um D.", "für A.", "an A."] },
+        { verb: "lachen", correct: "über A.", options: ["über A.", "über D.", "an A.", "für A."] },
+        { verb: "leiden", correct: "an D. / unter D.", options: ["an D. / unter D.", "an A. / unter A.", "auf A. / von D.", "für A. / an A."] },
+        { verb: "liegen", correct: "an D.", options: ["an D.", "an A.", "auf A.", "von D."] },
+        { verb: "nachdenken", correct: "über A.", options: ["über A.", "über D.", "an A.", "für A."] },
+        { verb: "rechnen", correct: "auf A. / mit D.", options: ["auf A. / mit D.", "auf D. / mit A.", "an A. / für D.", "von A. / an D."] },
+        { verb: "schreiben", correct: "an A. über A.", options: ["an A. über A.", "an D. über D.", "auf A. für A.", "von D. an A."] },
+        { verb: "schützen", correct: "A. vor D. / gegen A.", options: ["A. vor D. / gegen A.", "D. vor A. / gegen D.", "A. für A. / an D.", "D. an A. / auf A."] },
+        { verb: "sorgen", correct: "für A.", options: ["für A.", "für D.", "um A.", "an A."] },
+        { verb: "sich sorgen", correct: "um A.", options: ["um A.", "um D.", "für A.", "an A."] },
+        { verb: "sprechen", correct: "mit D. über A. / von D.", options: ["mit D. über A. / von D.", "mit A. über D. / von A.", "an D. für A. / an A.", "auf A. an D. / für A."] },
+        { verb: "sterben", correct: "an D. / für A.", options: ["an D. / für A.", "an A. / für D.", "von D. / auf A.", "auf A. / an A."] },
+        { verb: "teilnehmen", correct: "an D.", options: ["an D.", "an A.", "auf A.", "für A."] },
+        { verb: "träumen", correct: "von D.", options: ["von D.", "von A.", "an D.", "auf A."] },
+        { verb: "sich treffen", correct: "mit D.", options: ["mit D.", "mit A.", "an D.", "auf A."] },
+        { verb: "sich trennen", correct: "von D.", options: ["von D.", "von A.", "an D.", "auf A."] },
+        { verb: "sich unterhalten", correct: "mit D. über A.", options: ["mit D. über A.", "mit A. über D.", "an D. für A.", "auf A. an D."] },
+        { verb: "sich unterscheiden", correct: "von D. durch A.", options: ["von D. durch A.", "von A. durch D.", "an D. für A.", "auf A. an D."] },
+        { verb: "sich verabschieden", correct: "von D.", options: ["von D.", "von A.", "an D.", "auf A."] },
+        { verb: "verfügen", correct: "über A.", options: ["über A.", "über D.", "an A.", "für A."] },
+        { verb: "sich verlassen", correct: "auf A.", options: ["auf A.", "auf D.", "an A.", "für A."] },
+        { verb: "verzichten", correct: "auf A.", options: ["auf A.", "auf D.", "an A.", "für A."] },
+        { verb: "sich vorbereiten", correct: "auf A.", options: ["auf A.", "auf D.", "an A.", "für A."] },
+        { verb: "warnen", correct: "A. vor D.", options: ["A. vor D.", "D. vor A.", "A. für A.", "D. an A."] },
+        { verb: "warten", correct: "auf A.", options: ["auf A.", "auf D.", "an A.", "für A."] },
+        { verb: "sich wenden", correct: "an A.", options: ["an A.", "an D.", "auf A.", "für A."] },
+        { verb: "wirken", correct: "auf A.", options: ["auf A.", "auf D.", "an A.", "für A."] },
+        { verb: "sich wundern", correct: "über A.", options: ["über A.", "über D.", "an A.", "für A."] }
+    ];
+
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    const totalQuestions = 15;
+
+    // Элементы DOM
+    const quizSection = document.getElementById('quiz-section');
+    const resultSection = document.getElementById('result');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const nextBtn = document.getElementById('next-btn');
+    const progressText = document.getElementById('progress');
+    const scoreText = document.getElementById('score');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // Перемешивание массива (алгоритм Фишера-Йетса)
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // Инициализация теста
+    function startQuiz() {
+        // Перемешиваем все вопросы и берем первые 15
+        currentQuestions = shuffleArray([...allQuestions]).slice(0, totalQuestions);
+        currentQuestionIndex = 0;
+        score = 0;
+        
+        quizSection.style.display = 'block';
+        resultSection.style.display = 'none';
+        nextBtn.style.display = 'none';
+        
+        loadQuestion();
+    }
+
+    // Загрузка вопроса
+    function loadQuestion() {
+        const currentQuestion = currentQuestions[currentQuestionIndex];
+        
+        progressText.textContent = `Вопрос ${currentQuestionIndex + 1} из ${totalQuestions}`;
+        questionText.textContent = `${currentQuestion.verb} ...`;
+        
+        // Очищаем контейнер с вариантами
+        optionsContainer.innerHTML = '';
+        nextBtn.style.display = 'none';
+
+        // Перемешиваем варианты ответов для текущего вопроса
+        const shuffledOptions = shuffleArray([...currentQuestion.options]);
+
+        shuffledOptions.forEach(option => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.onclick = () => selectAnswer(button, option, currentQuestion.correct);
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    // Обработка выбора ответа
+    function selectAnswer(selectedButton, selectedOption, correctOption) {
+        const allButtons = optionsContainer.querySelectorAll('button');
+        
+        // Отключаем все кнопки после выбора
+        allButtons.forEach(btn => btn.disabled = true);
+
+        if (selectedOption === correctOption) {
+            selectedButton.classList.add('correct');
+            score++;
+        } else {
+            selectedButton.classList.add('wrong');
+            // Подсвечиваем правильный ответ
+            allButtons.forEach(btn => {
+                if (btn.textContent === correctOption) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
+
+        // Показываем кнопку "Следующий вопрос" или результаты
+        if (currentQuestionIndex < totalQuestions - 1) {
+            nextBtn.style.display = 'block';
+        } else {
+            // Если это был последний вопрос, показываем результат через небольшую задержку
+            setTimeout(showResult, 1500);
+        }
+    }
+
+    // Показ результатов
+    function showResult() {
+        quizSection.style.display = 'none';
+        resultSection.style.display = 'block';
+        scoreText.textContent = score;
+    }
+
+    // Обработчики событий
+    nextBtn.onclick = () => {
+        currentQuestionIndex++;
+        loadQuestion();
+    };
+
+    restartBtn.onclick = startQuiz;
+
+    // Запуск теста при загрузке страницы
+    startQuiz();
+</script>
+
+</body>
+</html>
+```
